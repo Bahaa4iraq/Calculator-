@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:calculator/colors.dart';
 import 'package:flutter/material.dart';
 import 'package:math_expressions/math_expressions.dart';
@@ -11,6 +13,7 @@ class MyHomePage extends StatefulWidget {
   State<MyHomePage> createState() => _MyHomePageState();
 }
 
+bool isSci = false;
 String equation = "0";
 String result = "0";
 String expression = "";
@@ -37,14 +40,101 @@ class _MyHomePageState extends State<MyHomePage> {
 
           ContextModel cm = ContextModel();
           result = '${exp.evaluate(EvaluationType.REAL, cm)}';
+          equation = result;
         } catch (e) {
           result = "Error";
         }
       } else if (buttonText == "+/-") {
         try {
-          var num1 = double.parse(result);
+          var num1 = double.parse(equation);
           num1 = num1 * (-1);
           result = "$num1";
+          equation = "$num1";
+        } catch (e) {
+          result = "Error";
+        }
+      } else if (buttonText == "sin") {
+        var equation1 = double.parse(equation);
+        equation1 = equation1 * pi / 180;
+        equation = "sin($equation1)";
+        expression = equation;
+        expression = expression.replaceAll('x', '*');
+        expression = expression.replaceAll('/', '/');
+
+        try {
+          Parser p = Parser();
+          Expression exp = p.parse(expression);
+
+          ContextModel cm = ContextModel();
+          result = '${exp.evaluate(EvaluationType.REAL, cm)}';
+          equation = result;
+        } catch (e) {
+          result = "Error";
+        }
+      } else if (buttonText == "cos") {
+        var equation1 = double.parse(equation);
+        equation1 = equation1 * pi / 180;
+        equation = "cos($equation1)";
+        expression = equation;
+        expression = expression.replaceAll('x', '*');
+        expression = expression.replaceAll('/', '/');
+
+        try {
+          Parser p = Parser();
+          Expression exp = p.parse(expression);
+
+          ContextModel cm = ContextModel();
+          result = '${exp.evaluate(EvaluationType.REAL, cm)}';
+          equation = result;
+        } catch (e) {
+          result = "Error";
+        }
+      } else if (buttonText == "sqr") {
+        equation = "$equation * $equation";
+
+        expression = equation;
+        expression = expression.replaceAll('x', '*');
+        expression = expression.replaceAll('/', '/');
+
+        try {
+          Parser p = Parser();
+          Expression exp = p.parse(expression);
+
+          ContextModel cm = ContextModel();
+          result = '${exp.evaluate(EvaluationType.REAL, cm)}';
+          equation = result;
+        } catch (e) {
+          result = "Error";
+        }
+      } else if (buttonText == "%") {
+        equation = "$equation/100";
+        expression = equation;
+        expression = expression.replaceAll('x', '*');
+        expression = expression.replaceAll('/', '/');
+
+        try {
+          Parser p = Parser();
+          Expression exp = p.parse(expression);
+
+          ContextModel cm = ContextModel();
+          result = '${exp.evaluate(EvaluationType.REAL, cm)}';
+          equation = result;
+        } catch (e) {
+          result = "Error";
+        }
+      } else if (buttonText == "sqrt") {
+        equation = "sqrt($equation)";
+        expression = equation;
+        expression = expression.replaceAll('x', '*');
+        expression = expression.replaceAll('/', '/');
+
+        try {
+          Parser p = Parser();
+          Expression exp = p.parse(expression);
+
+          ContextModel cm = ContextModel();
+          result = '${exp.evaluate(EvaluationType.REAL, cm)}';
+          equation = result;
         } catch (e) {
           result = "Error";
         }
@@ -53,7 +143,6 @@ class _MyHomePageState extends State<MyHomePage> {
           equation = "";
         }
         equation = equation + buttonText;
-        // equation = result;
       }
     });
   }
@@ -65,42 +154,47 @@ class _MyHomePageState extends State<MyHomePage> {
       backgroundColor: CalculatorColor.backround2,
       body: Column(
         children: [
-          Container(
-            padding: const EdgeInsets.all(20),
-            alignment: Alignment.bottomRight,
-            width: MediaQuery.of(context).size.width,
-            height: MediaQuery.of(context).size.height * 0.3,
-            color: CalculatorColor.backround,
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.end,
-              crossAxisAlignment: CrossAxisAlignment.end,
-              children: [
-                Text(
-                  result,
-                  style: TextStyle(
-                    fontFamily: "digital",
-                    color: CalculatorColor.backround2,
-                    fontSize: 45,
+          Stack(children: [
+            Container(
+              padding: const EdgeInsets.all(10),
+              alignment: Alignment.bottomRight,
+              width: MediaQuery.of(context).size.width,
+              height: MediaQuery.of(context).size.height * 0.3,
+              color: CalculatorColor.backround,
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.end,
+                crossAxisAlignment: CrossAxisAlignment.end,
+                children: [
+                  Text(
+                    result,
+                    style: TextStyle(
+                      //fontFamily: "digital",
+                      color: CalculatorColor.backround2,
+                      fontSize: 50,
+                    ),
                   ),
-                ),
-                const SizedBox(
-                  height: 10,
-                ),
-                Divider(
-                  color: CalculatorColor.backround2,
-                  thickness: 2,
-                ),
-                Text(
-                  equation,
-                  style: TextStyle(
-                    fontFamily: "digital",
+                  Divider(
                     color: CalculatorColor.backround2,
-                    fontSize: 25,
+                    thickness: 2,
                   ),
-                )
-              ],
+                  Text(
+                    equation,
+                    style: TextStyle(
+                      //fontFamily: "digital",
+                      color: CalculatorColor.backround2,
+                      fontSize: 30,
+                    ),
+                  )
+                ],
+              ),
             ),
-          ),
+            Switch(
+                inactiveTrackColor: CalculatorColor.secondary,
+                value: isSci,
+                onChanged: (_) => setState(() {
+                      isSci = !isSci;
+                    }))
+          ]),
           Expanded(
             child: Container(
               padding: const EdgeInsets.only(top: 10),
@@ -122,15 +216,24 @@ class _MyHomePageState extends State<MyHomePage> {
                             child: const ButtonText(txt: "C")),
                       ),
                       Expanded(
-                        child: InkWell(
-                            onTap: () => buttonPressed("+/-"),
-                            child: const ButtonText(txt: "+/-")),
+                        child: isSci
+                            ? InkWell(
+                                onTap: () => buttonPressed("sqrt"),
+                                child: const ButtonText(txt: "sqrt"))
+                            : InkWell(
+                                onTap: () => buttonPressed("+/-"),
+                                child: const ButtonText(txt: "+/-")),
                       ),
                       Expanded(
-                        child: InkWell(
-                          onTap: () => buttonPressed("/"),
-                          child: const ButtonText(txt: "/"),
-                        ),
+                        child: isSci
+                            ? InkWell(
+                                onTap: () => buttonPressed("%"),
+                                child: const ButtonText(txt: "%"),
+                              )
+                            : InkWell(
+                                onTap: () => buttonPressed("/"),
+                                child: const ButtonText(txt: "/"),
+                              ),
                       ),
                     ],
                   ),
@@ -157,10 +260,15 @@ class _MyHomePageState extends State<MyHomePage> {
                         ),
                       ),
                       Expanded(
-                        child: InkWell(
-                          onTap: () => buttonPressed("*"),
-                          child: const ButtonText(txt: "*"),
-                        ),
+                        child: isSci
+                            ? InkWell(
+                                onTap: () => buttonPressed("sin"),
+                                child: const ButtonText(txt: "sin"),
+                              )
+                            : InkWell(
+                                onTap: () => buttonPressed("*"),
+                                child: const ButtonText(txt: "*"),
+                              ),
                       ),
                     ],
                   ),
@@ -187,10 +295,15 @@ class _MyHomePageState extends State<MyHomePage> {
                         ),
                       ),
                       Expanded(
-                        child: InkWell(
-                          onTap: () => buttonPressed("-"),
-                          child: const ButtonText(txt: "-"),
-                        ),
+                        child: isSci
+                            ? InkWell(
+                                onTap: () => buttonPressed("cos"),
+                                child: const ButtonText(txt: "cos"),
+                              )
+                            : InkWell(
+                                onTap: () => buttonPressed("-"),
+                                child: const ButtonText(txt: "-"),
+                              ),
                       ),
                     ],
                   ),
@@ -217,10 +330,15 @@ class _MyHomePageState extends State<MyHomePage> {
                         ),
                       ),
                       Expanded(
-                        child: InkWell(
-                          onTap: () => buttonPressed("+"),
-                          child: const ButtonText(txt: "+"),
-                        ),
+                        child: isSci
+                            ? InkWell(
+                                onTap: () => buttonPressed("sqr"),
+                                child: const ButtonText(txt: "sqr"),
+                              )
+                            : InkWell(
+                                onTap: () => buttonPressed("+"),
+                                child: const ButtonText(txt: "+"),
+                              ),
                       ),
                     ],
                   ),

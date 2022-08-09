@@ -11,13 +11,18 @@ class ButtonText extends StatefulWidget {
 }
 
 class _ButtonTextState extends State<ButtonText> {
-  List operator = ["+", "-", "*", "/", "AC", "C", "=", "+/-"];
+  List operator = ["+", "-", "*", "/", "AC", "C", "+/-"];
+  List sci = ["cos", "sqr", "sqrt", "%", "sin"];
 
-  bool checkType(String symbol) {
+  Color checkType(String symbol) {
     if (operator.contains(symbol)) {
-      return true;
+      return CalculatorColor.primary;
+    } else if (sci.contains(symbol)) {
+      return CalculatorColor.sciColor;
+    } else if (symbol == "=") {
+      return CalculatorColor.equal;
     } else {
-      return false;
+      return CalculatorColor.secondary;
     }
   }
 
@@ -31,12 +36,7 @@ class _ButtonTextState extends State<ButtonText> {
           borderRadius: BorderRadius.circular(15),
           border: Border.all(color: Colors.white70),
           gradient: LinearGradient(
-            colors: [
-              CalculatorColor.backround,
-              checkType(widget.txt)
-                  ? CalculatorColor.secondary
-                  : CalculatorColor.primary
-            ],
+            colors: [CalculatorColor.backround, checkType(widget.txt)],
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
           )),
